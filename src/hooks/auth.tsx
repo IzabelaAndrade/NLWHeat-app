@@ -20,7 +20,6 @@ type User = {
 type AuthContextData = {
   user: User | null;
   isSignIn: boolean;
-  // signInUrl: string;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -101,20 +100,6 @@ function AuthProvider({children}: AuthProvider) {
     }
     loaduserStorageData();
   },[])
-  
-  // useEffect(() => {
-  //   const url = window.location.href;
-  //   const hasGithubCode = url.includes('?code=')
-
-
-  //   if (hasGithubCode) {
-  //     const [urlWithoutCode, githubCode] = url.split('?code=')
-
-  //     window.history.pushState({}, '', urlWithoutCode);
-
-  //     signIn(githubCode);
-  //   }
-  // },[])
 
 
   return(
