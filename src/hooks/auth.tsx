@@ -82,8 +82,9 @@ function AuthProvider({children}: AuthProvider) {
   }
 
   async function  signOut() {
-    // setUser(null);
-    // localStorage.removeItem('@dowhile:token');
+    setUser(null);
+    AsyncStorage.removeItem(USER_STORAGE);
+    AsyncStorage.removeItem(TOKEN_STORAGE);
   }
   
   useEffect(() => {
