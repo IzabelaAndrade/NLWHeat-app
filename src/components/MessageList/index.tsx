@@ -1,27 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
 } from 'react-native';
-import { Message } from '../Message';
+import io from 'socket.io-client';
+import { api } from '../../services/api';
+import { Message, MessageProps } from '../Message';
 
 import { styles } from './styles';
 
+const messageQueue: MessageProps[] = [];
+
+const socket = io('http://localhost:4000');
+
+socket.on('new_message', (newMessage: MessageProps) => {
+  messageQueue.push(newMessage);
+})
+
 export function MessageList(){
 
-  const DATA = {
-    id: '123',
-    text: "texto da mensagem",
-    user: {
-      name: "Izabela Andrade",
-      avatar_url: "",
+  const [currentMessage, setCurrentMessage] = useState<MessageProps[]>([]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      if(messageQueue.length > 0) {
+        setCurrentMessage(oldValue => [
+          messageQueue[0],
+          oldValue[0],
+          oldValue[1],
+        ].filter(Boolean));
+
+        messageQueue.shift()
+      }
+    }, 3000);
+
+    return () => clearInterval(timer);
+  },[])
+
+  useEffect(() => {
+    async function fetchmessage() {
+      const messageResponse = await api.get<MessageProps[]>('/messages/last3');
+      setCurrentMessage(messageResponse.data);
     }
-  }
+    fetchmessage();
+  },[])
+
   return (
-    <ScrollView style={styles.container}
+    <ScrollView 
+      style={styles.container}
       contentContainerStyle={styles.content}
       keyboardShouldPersistTaps='never'
     >
-      <Message data={DATA}/>
+      {
+        currentMessage.map((message) => {
+          return (<Message key={message.id} data={message}/>)
+        })
+      }
     </ScrollView>
   );
 }
